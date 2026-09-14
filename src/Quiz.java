@@ -41,4 +41,18 @@ public class Quiz {
         }
         return loggedPlayer;
     }
+
+    public Question addQuestion(String question, String answer) {
+        Question q = new Question(question, answer);
+        questions.add(q);
+        return q;
+    }
+
+    public Question removeQuestion(int index) {
+        return questions.remove(index);
+    }
+
+    public Question getQuestion(int index) {
+        return questions.get(index);
+    }
 }
