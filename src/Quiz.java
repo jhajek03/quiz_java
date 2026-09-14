@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Random;
+import java.util.Scanner;
 
 public class Quiz {
     private static ArrayList<Player> registeredPlayers = new ArrayList<Player>();
@@ -11,6 +14,18 @@ public class Quiz {
 
     private Boolean isLoggedIn() {
         return loggedPlayer != null;
+    }
+
+    private ArrayList<Integer> questionMaker() {
+        ArrayList<Integer> draw = new ArrayList<Integer>();
+        Random random = new Random();
+        for (int i = 0; i < 5; i++) {
+            int drawnQuestion = random.nextInt(questions.size());
+            if (!draw.contains(drawnQuestion)) {
+                draw.add(drawnQuestion);
+            }
+        }
+        return draw;
     }
 
     public Player registerPlayer(String username, String password, String passwordAgain) {
@@ -42,10 +57,13 @@ public class Quiz {
         return loggedPlayer;
     }
 
-    public Question addQuestion(String question, String answer) {
+    public void logout(){
+        loggedPlayer = null;
+    }
+
+    public void addQuestion(String question, String answer) {
         Question q = new Question(question, answer);
         questions.add(q);
-        return q;
     }
 
     public Question removeQuestion(int index) {
@@ -54,5 +72,34 @@ public class Quiz {
 
     public Question getQuestion(int index) {
         return questions.get(index);
+    }
+
+    public void listScores(Quiz quiz) {
+        ArrayList<Player> players = registeredPlayers;
+        players.sort(Comparator.comparing(Player::getBestScore));
+        for (Player player : players) {
+            System.out.println(player.getUsername() + " " + player.getBestScore());
+        }
+    }
+
+    public void startQuiz() {
+        if (isLoggedIn()) {
+            int score = 0;
+            ArrayList<Integer> draw = questionMaker();
+            for (int i = 0; i < draw.size(); i++) {
+                System.out.println(getQuestion(draw.get(i)).question());
+                Scanner answerScanner = new Scanner(System.in);
+                System.out.print("Your answer: ");
+                String answer = answerScanner.nextLine();
+                if(answer.equals(getQuestion(draw.get(i)).answer())) {
+                    score++;
+                    System.out.println("Correct!");
+                }
+            }
+            System.out.println("Your score is " + score);
+            if (score > getLoggedPlayer().getBestScore()) {
+                getLoggedPlayer().setBestScore(score);
+            }
+        }
     }
 }
